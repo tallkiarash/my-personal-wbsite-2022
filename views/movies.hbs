@@ -1,0 +1,18 @@
+<h1>movies</h1>
+
+
+
+{{#if movies.lenght}}
+    <ul>
+        {{#each movies}}
+            <li>{{title}} ({{grade}}/10)</li>
+        {{/each}}
+    </ul>
+
+    {{else}}
+
+    <p>nothing to shown</p>
+    
+{{/if}}
+
+
