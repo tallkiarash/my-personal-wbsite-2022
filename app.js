@@ -20,6 +20,22 @@ app.get('/movies', function(request, response){
     }
 })
 
+
+//get req for the movies one or two or...
+app.get ("/movies/:id", function(request, response){
+
+    const id = request.params.id
+
+    data.movies.find (m => m. id == id)
+
+    const model = {
+        movie:movie,
+    }
+
+    response.render('movie.hbs', model)
+
+})
+
 //middleware function
 app.use(
     express.static('public')
