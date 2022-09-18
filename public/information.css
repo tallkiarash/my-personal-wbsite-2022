@@ -1,0 +1,17 @@
+.info{
+    float: right;
+    text-align: left;
+    font-size: large;
+    margin-right: 15rem;
+    margin-top: 10rem;
+    line-height: 2rem;
+}
+
+.contact{
+    text-align: center;
+}
+
+.img{
+    margin-top: 15rem;
+    padding: 2rem;
+}
