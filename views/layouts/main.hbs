@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/layout.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=, initial-scale=1.0">
     <title>my website</title>
@@ -10,26 +11,35 @@
 <body>
 
     <header>
-        my personal website
+        KIARASH
     </header>
 
-    <nav>
-        <a href="/">HOME</a>
-        <a href="/portfolio">PORTFOLIO</a>
-        <a href="/aboutme">ABOUT ME</a>
-        <a href="/information">CONTACT</a>
-        <a href="/blogPost">BLOGPOST</a>
-        <a href="/guestbook">GUESTBOOK</a>
-    </nav>
+    <div class="sideBar">
+        <nav class="nav">
+
+            <div class="image">
+                <img src="/pics/k-logo.png">
+            </div>
+
+            <ul>
+                <li><a href="/">HOME</a></li>
+                <li><a href="/portfolio">PORTFOLIO</a></li>
+                <li><a href="/aboutme">ABOUT ME</a></li>
+                <li><a href="/information">CONTACT</a></li>
+                <li><a href="/blogPost">BLOGPOST</a></li>
+                <li><a href="/guestbook">GUESTBOOK</a></li>
+                <li><a href="/login">login</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    
     
     {{{body}}}
 
     <footer>
-        <br>contact information:</br>
-        <br>phone: 0761111</br>
-        <br>adress: Odengatan </br>
-        <br>email: kiarash.kia.007@gmail.com</br>
+        COPYRIGHT 
     </footer>
-    
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
 </body>
 </html>

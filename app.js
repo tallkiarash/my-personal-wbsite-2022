@@ -51,6 +51,14 @@ app.get('/guestBook', function (request, response){
     response.render('guestBook.hbs', model)
 })
 
+app.get('/login', function (request, response){
+    const model = {
+        login: data.login
+    }
+
+    response.render('login.hbs', model)
+})
+
 //get req for the movies one or two or...
 app.get("/movies/:id", function(request, response){
 
