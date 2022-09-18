@@ -1,0 +1,13 @@
+.dtl{
+    float: right;
+    text-align: left;
+    font-size: large;
+    margin-right: 10rem;
+    margin-top: 5rem;
+    padding: 0.5rem;
+    line-height: 1.5rem;
+}
+
+.aboutMe{
+    text-align: center;
+}
