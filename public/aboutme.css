@@ -1,8 +1,5 @@
 .card{
+    text-align: left;
     margin-top: 7rem;
     margin-left: 12rem;
-}
-
-.col{
-    text-align: left;
 }
