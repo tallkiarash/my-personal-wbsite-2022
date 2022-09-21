@@ -1,0 +1,50 @@
+.container{
+    line-height: 2rem;
+}
+
+.header{
+    text-align: center;
+}
+
+.commentBox{
+    top: 100;
+}
+
+.commentBox input:focus{
+    border: 0.2rem solid #402341;
+}
+
+.commentBox input{
+    text-align: left;
+    width: 15rem;
+    height: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #86b0b6;
+}
+
+.commentBox textarea{
+    height: 6rem;
+    width: 15rem;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #86b0b6;
+}
+
+.commentBox textarea:focus{
+    border: 0.3rem solid #402341;
+    outline: none;
+}
+
+.commentBox button{
+    border: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.commentBox button:hover{
+    background-color: #402341;
+}
+ 
