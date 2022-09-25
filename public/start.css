@@ -1,0 +1,45 @@
+#home{
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 780px;
+    justify-content: center;
+    align-items: center;
+    color: rgb(237, 8, 8);
+}
+
+#home::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: url(pics/me.jpg) no-repeat center center/ cover;
+    height: 900px;
+    width: 100%;
+    z-index: -1;
+    opacity: 100%;
+}
+
+.headings{
+    font-family: century;
+    text-align: center;
+    margin: 40px 0px;
+    font-size: 3rem;
+}
+
+.btn{
+    margin-left: 150px;
+    padding: 15px 45px;
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    outline: none;
+    transition: .6s ease;
+}
+
+.btn:hover{
+    background-color: white;
+    color: black;
+    box-shadow: rgb(0, 0, 0);
+    font-size: larger;
+}

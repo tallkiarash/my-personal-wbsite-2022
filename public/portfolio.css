@@ -1,9 +1,13 @@
 .card{
-    margin-left: 12rem;
+    margin-left: 8rem;
     margin-bottom: 1.5rem;
 }
 
 .h1{
     padding: 1rem;
     text-align: center;
+}
+
+.card-body h1{
+    color: red;
 }

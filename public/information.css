@@ -1,6 +1,21 @@
-.card{
-    margin-top: 7rem;
-    margin-left: 12rem;
-    text-align: center;
-    line-height: 1.5rem;
+#contc{
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.584);
+    height: 780px;
+    justify-content: center;
+    align-items: center;
+    color: rgb(237, 8, 8);
+}
+
+#contc::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: url(pics/me-2.jpg) no-repeat center center/ cover;
+    height: 900px;
+    width: 100%;
+    z-index: -1;
+    opacity: 100%;
 }
