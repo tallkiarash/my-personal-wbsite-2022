@@ -3,7 +3,7 @@
 }
 
 .nav{
-    background-color: #42424255;
+    background-color: #1e1e1e71;
     text-decoration: none;
     color: black;
 }
@@ -11,6 +11,12 @@
 .nav li{
     font-weight: bold;
     margin: 3rem;
+}
+
+.nav li a {
+    text-decoration: none;
+    color: rgb(255, 0, 0);
+    font-size: 16pt;
 }
 
 footer{
