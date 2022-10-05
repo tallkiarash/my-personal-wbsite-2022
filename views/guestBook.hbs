@@ -6,17 +6,26 @@
 
     <div class="form">
         <form action="" method="post">
-            <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">Your Name</label>
-                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Bob">
-            </div>
-            <div class="mb-3">
-                <label for="exampleFormControlTextarea1" class="form-label">Your comment</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            <div>
+                name:<input type="text" name="name">
             </div>
             <div>
-                <button class="btn btn-primary" type="post">post</button>
-            </div>          
-        </form>
+                comment:<input type="text" name="comment">
+            </div>
+            <input type="submit" value="create">
     </div>
 </div>
+
+{{#if comments.length}}
+    <p>we have comments!{{comments.length}}</p>
+
+    <ul>
+        {{#each comments}}
+            <li>{{name}}</li>
+            <li>{{comment}}</li>
+        {{/each}}
+    </ul>
+
+{{else}}
+    <p>we have no comments!</p>
+{{/if}}

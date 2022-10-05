@@ -4,23 +4,16 @@
 
 
 
-//if we have a movie or something
-exports.movies = [{
-     id:1,
-     title: "eye of the tiger" ,
-     grade: 9
+//if we have a comment/s or something
+exports.guestBook = [{
+    id:1,
+    Comment: "good website" ,
+    name: "kiarash"
  },
 
  {
-     id:2,
-     title: "eye of the tiger2" ,
-     grade: 9
- },
-
- {
-     id:3,
-     title: "eye of the tiger3" ,
-     grade: 9
+    id:2,
+    Comment: "not good website" ,
+    name: "mm"
  }
-
 ]
