@@ -3,11 +3,11 @@
     margin-bottom: 1.5rem;
 }
 
-.h1{
-    padding: 1rem;
+.card h1{
     text-align: center;
-}
-
-.card-body h1{
     color: red;
+}
+.card-text{
+    color: black;
+    text-align: center;
 }

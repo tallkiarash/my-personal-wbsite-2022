@@ -1,0 +1,11 @@
+<form action="" method="post">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Name: </label>
+                <input type="text" name="name" value = "{{comment.name}}"  class="form-control" id="exampleFormControlInput1">
+                </div>
+                <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Your comment: </label>
+                <textarea class="form-control" type="text" name="comment" id="exampleFormControlTextarea1" rows="3">{{comment.comment}}</textarea>
+            </div>
+            <input class="btn btn-primary" type="submit" value="update">
+</form>

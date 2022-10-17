@@ -4,6 +4,7 @@ const expressHandlebars = require("express-handlebars")
 const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
+const req = require('express/lib/request')
 
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
@@ -32,10 +33,22 @@ db.run(`
     )
 `)
 
-const comments = [
-    {id: 1, name: "kiarash", comment: "this is good website"},
-    { id: 2, name: "mm", comment: "this is not good website"}
-]
+db.run(`
+    	CREATE TABLE IF NOT EXISTS PORTFOLIO (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            comment TEXT
+    )
+`)
+
+db.run(`
+    	CREATE TABLE IF NOT EXISTS BLOGPOST (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        comment TEXT
+    )
+`)
+
 
 //username and password
 const actualusername = "kiarash"
@@ -54,12 +67,121 @@ app.get('/', function(request, response){
     response.render('start.hbs', model) // you can make the sprate file of HTML and specify the name to open here
 })
 
-app.get('/portfolio', function(request, response){
-    const model = {
-        portfolio: data.portfolio
-    }
-    response.render('portfolio.hbs', model)
+
+
+app.get('/portfolio', function (request, response){
+    const query = "SELECT * FROM PORTFOLIO"
+
+    db.all(query, function(error, portfolios){
+        const model = {
+            portfolios
+        }
+    
+        response.render('portfolio.hbs', model)
+    })
 })
+
+app.post("/portfolio", function(request, response){
+    const name = request.body.name
+    const comment = request.body.comment
+
+    const query=`INSERT INTO PORTFOLIO (name, comment) VALUES (?,?); `
+    const VALUES = [name , comment]
+
+    db.run(query, VALUES, function(error){
+        response.redirect("/portfolio")
+    })
+})
+
+app.get("/portfolio/:id", function(request, response){
+
+    const id = request.params.id
+
+    const query = `SELECT * FROM PORTFOLIO WHERE id = ?`
+    const VALUES = [id];
+
+    db.get(query , VALUES, function(error, portfolio){
+
+        const model = {
+            portfolio
+        }
+        response.render('portfolio.hbs', model)
+    })
+})
+
+app.get("/update-portfolio/:id" , function(request, response){
+
+    const id = request.params.id;
+    const query = `SELECT * FROM PORTFOLIO WHERE id = ?`;
+    const VALUES = [id];
+
+    db.get(query, VALUES, function(error , portfolio){
+        const model = { portfolio };
+        response.render("update-portfolio.hbs", model)
+    })
+})
+
+app.post("/update-portfolio/:id" , function(request, response){
+    const id = request.params.id;
+    const newComment = request.body.comment;
+    const newName = request.body.name;
+
+    const blogPost= {
+        comment : newComment,
+        name : newName,
+        id : id
+    }
+
+    const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
+
+    
+    const VALUES = [
+        newName,
+        newComment,
+        id
+    ]
+    db.run(query, VALUES, function (error){
+        if(error){
+            console.log(error)
+        } else{
+            response.redirect("/portfolio")
+        }
+    })
+
+})
+
+app.post("/delete-portfolio/:id", function(request, response){
+    const id = request.params.id;
+
+    const query= `DELETE FROM PORTFOLIO WHERE id = ?`;
+    db.run(query, [id], function(error){
+        if(error){
+            console.log(error)
+        } 
+        else{
+            response. redirect("/portfolio")
+        }
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get('/aboutme', function (request, response){
     const model = {
@@ -77,13 +199,105 @@ app.get('/information', function (request, response){
     response.render('information.hbs', model)
 })
 
+
+
 app.get('/blogPost', function (request, response){
-    const model = {
-        blogPost: data.blogPost
+    const query = "SELECT * FROM BLOGPOST"
+
+    db.all(query, function(error, blogPosts){
+        const model = {
+            blogPosts
+        }
+    
+        response.render('blogPost.hbs', model)
+    })
+})
+
+app.post("/blogPost", function(request, response){
+    const name = request.body.name
+    const comment = request.body.comment
+
+    const query=`INSERT INTO BLOGPOST (name, comment) VALUES (?,?); `
+    const VALUES = [name , comment]
+
+    db.run(query, VALUES, function(error){
+        response.redirect("/blogPost")
+    })
+})
+
+app.get("/blogPost/:id", function(request, response){
+
+    const id = request.params.id
+
+    const query = `SELECT * FROM BLOGPOST WHERE id = ?`
+    const VALUES = [id];
+
+    db.get(query , VALUES, function(error, blogPost){
+
+        const model = {
+            blogPost
+        }
+        response.render('blogPost.hbs', model)
+    })
+})
+
+app.get("/update-blogPost/:id" , function(request, response){
+
+    const id = request.params.id;
+    const query = `SELECT * FROM BLOGPOST WHERE id = ?`;
+    const VALUES = [id];
+
+    db.get(query, VALUES, function(error , blogPost){
+        const model = { blogPost };
+        response.render("update-blogPost.hbs", model)
+    })
+})
+
+app.post("/update-blogPost/:id" , function(request, response){
+    const id = request.params.id;
+    const newComment = request.body.comment;
+    const newName = request.body.name;
+
+    const blogPost= {
+        comment : newComment,
+        name : newName,
+        id : id
     }
 
-    response.render('blogPost.hbs', model)
+    const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
+
+    
+    const VALUES = [
+        newName,
+        newComment,
+        id
+    ]
+    db.run(query, VALUES, function (error){
+        if(error){
+            console.log(error)
+        } else{
+            response.redirect("/blogPost")
+        }
+    })
+
 })
+
+app.post("/delete-blogPost/:id", function(request, response){
+    const id = request.params.id;
+
+    const query= `DELETE FROM BLOGPOST WHERE id = ?`;
+    db.run(query, [id], function(error){
+        if(error){
+            console.log(error)
+        } 
+        else{
+            response. redirect("/blogpost")
+        }
+    })
+})
+
+
+
 
 app.get('/guestBook', function (request, response){
     const query = "SELECT * FROM COMMENTS"
@@ -101,7 +315,7 @@ app.post("/guestBook", function(request, response){
     const name = request.body.name
     const comment = request.body.comment
 
-    const query=`INSERT INTO COMMENTS (name, comment) VALUES (?,?); `
+    const query=`INSERT INTO comments (name, comment) VALUES (?,?); `
     const VALUES = [name , comment]
 
     db.run(query, VALUES, function(error){
@@ -122,6 +336,60 @@ app.get("/guestBook/:id", function(request, response){
             comments
         }
         response.render('guestBook.hbs', model)
+    })
+})
+
+app.get("/update-comments/:id" , function(request, response){
+
+    const id = request.params.id;
+    const query = `SELECT * FROM COMMENTS WHERE id = ?`;
+    const VALUES = [id];
+
+    db.get(query, VALUES, function(error , comment){
+        const model = { comment };
+        response.render("update-comments.hbs", model)
+    })
+})
+
+app.post("/update-comments/:id" , function(request, response){
+    const id = request.params.id;
+    const newComment = request.body.comment;
+    const newName = request.body.name;
+
+    const comment= {
+        comment : newComment,
+        name : newName,
+        id : id
+    }
+
+    const query = ` UPDATE COMMENTS SET name =? , comment=? WHERE id =?`;
+
+    
+    const VALUES = [
+        newName,
+        newComment,
+        id
+    ]
+    db.run(query, VALUES, function (error){
+        if(error){
+            console.log(error)
+        } else{
+            response.redirect("/guestBook")
+        }
+    })
+})
+
+app.post("/delete-comment/:id", function(request, response){
+    const id = request.params.id;
+
+    const query= `DELETE FROM COMMENTS WHERE id = ?`;
+    db.run(query, [id], function(error){
+        if(error){
+            console.log(error)
+        } 
+        else{
+            response. redirect("/guestBook")
+        }
     })
 })
 
