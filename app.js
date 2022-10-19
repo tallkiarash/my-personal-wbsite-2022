@@ -9,6 +9,9 @@ const req = require('express/lib/request')
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
 
+const minCommentsLength = 10
+const minNameLength = 5
+
 //middleware function 
 ///send the file to the browser
 app.use(
@@ -68,7 +71,7 @@ app.get('/', function(request, response){
 })
 
 
-
+//portfolio
 app.get('/portfolio', function (request, response){
     const query = "SELECT * FROM PORTFOLIO"
 
@@ -81,16 +84,41 @@ app.get('/portfolio', function (request, response){
     })
 })
 
+function validationErrorsForPortfolio (name , comment){
+    const validationErrors = []
+
+    if(name.length <= minNameLength){
+        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+    }
+
+    if(comment.length <= minCommentsLength){
+        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+    }
+
+    return validationErrors
+}
+
 app.post("/portfolio", function(request, response){
     const name = request.body.name
     const comment = request.body.comment
+    const validationErrors = validationErrorsForPortfolio(name, comment)
 
-    const query=`INSERT INTO PORTFOLIO (name, comment) VALUES (?,?); `
-    const VALUES = [name , comment]
+    if (validationErrors.length== 0){
 
-    db.run(query, VALUES, function(error){
-        response.redirect("/portfolio")
-    })
+        const query=`INSERT INTO PORTFOLIO (name, comment) VALUES (?,?); `
+        const VALUES = [name , comment]
+
+        db.run(query, VALUES, function(error){
+            response.redirect("/portfolio")
+        })
+    }else{
+        const model ={
+            validationErrors,
+            name,
+            comment
+        }
+        response.render('portfolio.hbs', model)
+    }
 })
 
 app.get("/portfolio/:id", function(request, response){
@@ -125,28 +153,36 @@ app.post("/update-portfolio/:id" , function(request, response){
     const id = request.params.id;
     const newComment = request.body.comment;
     const newName = request.body.name;
-
-    const blogPost= {
+    const validationErrors = validationErrorsForPortfolio(newName, newComment)
+    
+    const portfolio= {
         comment : newComment,
         name : newName,
         id : id
     }
+    if(validationErrors.length == 0){
+        const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
 
-    const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
-
-    
-    const VALUES = [
-        newName,
-        newComment,
-        id
-    ]
-    db.run(query, VALUES, function (error){
-        if(error){
-            console.log(error)
-        } else{
-            response.redirect("/portfolio")
+        
+        const VALUES = [
+            newName,
+            newComment,
+            id
+        ]
+        db.run(query, VALUES, function (error){
+            if(error){
+                console.log(error)
+            } else{
+                response.redirect("/portfolio")
+            }
+        })
+    }else{
+        const model = { 
+            portfolio, 
+            validationErrors
         }
-    })
+        response.render("update-portfolio.hbs", model)
+    }
 
 })
 
@@ -164,25 +200,6 @@ app.post("/delete-portfolio/:id", function(request, response){
     })
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.get('/aboutme', function (request, response){
     const model = {
         aboutme: data.aboutme
@@ -199,8 +216,7 @@ app.get('/information', function (request, response){
     response.render('information.hbs', model)
 })
 
-
-
+//blogpost
 app.get('/blogPost', function (request, response){
     const query = "SELECT * FROM BLOGPOST"
 
@@ -213,16 +229,40 @@ app.get('/blogPost', function (request, response){
     })
 })
 
+function validationErrorsForBlogPost (name , comment){
+    const validationErrors = []
+
+    if(name.length <= minNameLength){
+        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+    }
+
+    if(comment.length <= minCommentsLength){
+        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+    }
+
+    return validationErrors
+}
+
 app.post("/blogPost", function(request, response){
     const name = request.body.name
     const comment = request.body.comment
+    const validationErrors = validationErrorsForBlogPost(name, comment)
 
-    const query=`INSERT INTO BLOGPOST (name, comment) VALUES (?,?); `
-    const VALUES = [name , comment]
+    if (validationErrors.length== 0){
+        const query=`INSERT INTO BLOGPOST (name, comment) VALUES (?,?); `
+        const VALUES = [name , comment]
 
-    db.run(query, VALUES, function(error){
-        response.redirect("/blogPost")
-    })
+        db.run(query, VALUES, function(error){
+            response.redirect("/blogPost")
+        })
+    }else{
+        const model ={
+            validationErrors,
+            name,
+            comment
+        }
+        response.render('blogPost.hbs', model)
+    }
 })
 
 app.get("/blogPost/:id", function(request, response){
@@ -257,29 +297,37 @@ app.post("/update-blogPost/:id" , function(request, response){
     const id = request.params.id;
     const newComment = request.body.comment;
     const newName = request.body.name;
+    const validationErrors = validationErrorsForBlogPost(newName, newComment)
 
     const blogPost= {
         comment : newComment,
         name : newName,
         id : id
     }
+    if(validationErrors.length == 0){
+        const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
 
-    const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
-
-    
-    const VALUES = [
-        newName,
-        newComment,
-        id
-    ]
-    db.run(query, VALUES, function (error){
-        if(error){
-            console.log(error)
-        } else{
-            response.redirect("/blogPost")
+        
+        const VALUES = [
+            newName,
+            newComment,
+            id
+        ]
+        db.run(query, VALUES, function (error){
+            if(error){
+                console.log(error)
+            } else{
+                response.redirect("/blogPost")
+            }
+        })
+    } else{
+        const model = { 
+            blogPost, 
+            validationErrors
         }
-    })
-
+        response.render("update-blogPost.hbs", model)
+    }
+    
 })
 
 app.post("/delete-blogPost/:id", function(request, response){
@@ -298,7 +346,7 @@ app.post("/delete-blogPost/:id", function(request, response){
 
 
 
-
+//guestbook
 app.get('/guestBook', function (request, response){
     const query = "SELECT * FROM COMMENTS"
 
@@ -311,16 +359,41 @@ app.get('/guestBook', function (request, response){
     })
 })
 
+function validationErrorsForGuestBook (name , comment){
+    const validationErrors = []
+
+    if(name.length <= minNameLength){
+        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+    }
+
+    if(comment.length <= minCommentsLength){
+        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+    }
+
+    return validationErrors
+}
+
 app.post("/guestBook", function(request, response){
     const name = request.body.name
     const comment = request.body.comment
+    const validationErrors = validationErrorsForGuestBook(name, comment)
 
-    const query=`INSERT INTO comments (name, comment) VALUES (?,?); `
-    const VALUES = [name , comment]
+    if (validationErrors.length== 0){
 
-    db.run(query, VALUES, function(error){
-        response.redirect("/guestBook")
-    })
+        const query=`INSERT INTO comments (name, comment) VALUES (?,?); `
+        const VALUES = [name , comment]
+
+        db.run(query, VALUES, function(error){
+            response.redirect("/guestBook")
+        })
+    }else{
+        const model ={
+            validationErrors,
+            name,
+            comment
+        }
+        response.render('guestBook.hbs', model)
+    }
 })
 
 app.get("/guestBook/:id", function(request, response){
@@ -355,28 +428,36 @@ app.post("/update-comments/:id" , function(request, response){
     const id = request.params.id;
     const newComment = request.body.comment;
     const newName = request.body.name;
+    const validationErrors = validationErrorsForGuestBook(newName, newComment)
 
     const comment= {
         comment : newComment,
         name : newName,
         id : id
     }
+    if(validationErrors.length == 0){
+        const query = ` UPDATE COMMENTS SET name =? , comment=? WHERE id =?`;
 
-    const query = ` UPDATE COMMENTS SET name =? , comment=? WHERE id =?`;
-
-    
-    const VALUES = [
-        newName,
-        newComment,
-        id
-    ]
-    db.run(query, VALUES, function (error){
-        if(error){
-            console.log(error)
-        } else{
-            response.redirect("/guestBook")
+        
+        const VALUES = [
+            newName,
+            newComment,
+            id
+        ]
+        db.run(query, VALUES, function (error){
+            if(error){
+                console.log(error)
+            } else{
+                response.redirect("/guestBook")
+            }
+        })
+    }else{
+        const model = { 
+            comment, 
+            validationErrors
         }
-    })
+        response.render("update-comments.hbs", model)
+    }
 })
 
 app.post("/delete-comment/:id", function(request, response){

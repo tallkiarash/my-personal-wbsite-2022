@@ -46,14 +46,23 @@
     </div>
 </div>
 
+{{#if validationErrors.length}}
+    <p>could not create because:</p>
+    <ul>
+        {{#each validationErrors}}
+            <li>{{this}}</li>
+        {{/each}}
+    </ul>
+{{/if}}
+
 <form action="" method="post">
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Name: </label>
-            <input type="text" name="name" value = "{{portfolios.name}}"  class="form-control" id="exampleFormControlInput1">
+            <input type="text" name="name" value = "{{portfolios.name}}" class="form-control" id="exampleFormControlInput1">
             </div>
             <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">Your comment: </label>
-            <textarea class="form-control" type="text" name="comment" id="exampleFormControlTextarea1" rows="3">{{portfolios.comment}}</textarea>
+            <textarea class="form-control" type="text" name="comment" id="exampleFormControlTextarea1" rows="3" >{{portfolios.comment}}</textarea>
         </div>
         <input class="btn btn-primary" type="submit" value="create">
 </form>

@@ -3,6 +3,14 @@
         <h1>Guestbook</h1>
         <p1> what do you think of my website?</p1>
     </div>
+    {{#if validationErrors.length}}
+        <p>could not create because:</p>
+        <ul>
+            {{#each validationErrors}}
+                <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    {{/if}}
 
     <div class="form">
         <form action="" method="post">
