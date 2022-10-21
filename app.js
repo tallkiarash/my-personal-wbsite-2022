@@ -28,6 +28,7 @@ app.use(expressSession({
     resave: false
 }))
 
+//database tables
 db.run(`
     	CREATE TABLE IF NOT EXISTS COMMENTS (
         id INTEGER PRIMARY KEY,
@@ -52,7 +53,6 @@ db.run(`
     )
 `)
 
-
 //username and password
 const actualusername = "kiarash"
 const actualpassword = "Admin"
@@ -62,14 +62,39 @@ app.engine('hbs', expressHandlebars.engine({
     defaultLayout: "main.hbs" , 
 }))
 
-app.get('/', function(request, response){
-    const model = {
-        session: request.session
-    }
-
-    response.render('start.hbs', model) // you can make the sprate file of HTML and specify the name to open here
+app.use(function (request, response, next) {
+  const isLoggedIn = request.session.isLoggedIn;
+  response.locals.isLoggedIn = isLoggedIn;
+  next();
 })
 
+//login 
+app.get('/login', function (request, response){
+    response.render('login.hbs')
+})
+
+app.post('/login', function (request, response){
+    const realusername = request.body.username
+    const realpassword = request.body.password
+
+    if(realusername == actualusername && realpassword == actualpassword){
+        request.session.isLoggedIn = true
+        response.redirect('/')
+    }else{
+        //err messg
+        response.render('login.hbs')
+    }
+})
+
+app.get("/logout", function(request, response){
+    request.session.isLoggedIn= false
+    response.redirect("/")
+})
+
+//first page
+app.get('/', function(request, response){
+    response.render('start.hbs') // you can make the sprate file of HTML and specify the name to open here
+})
 
 //portfolio
 app.get('/portfolio', function (request, response){
@@ -200,6 +225,7 @@ app.post("/delete-portfolio/:id", function(request, response){
     })
 })
 
+//about me
 app.get('/aboutme', function (request, response){
     const model = {
         aboutme: data.aboutme
@@ -208,6 +234,7 @@ app.get('/aboutme', function (request, response){
     response.render('aboutme.hbs', model)
 })
 
+//info of me
 app.get('/information', function (request, response){
     const model = {
         information: data.information
@@ -344,8 +371,6 @@ app.post("/delete-blogPost/:id", function(request, response){
     })
 })
 
-
-
 //guestbook
 app.get('/guestBook', function (request, response){
     const query = "SELECT * FROM COMMENTS"
@@ -474,22 +499,5 @@ app.post("/delete-comment/:id", function(request, response){
     })
 })
 
-//login 
-app.get('/login', function (request, response){
-    response.render('login.hbs')
-})
-
-app.post('/login', function (request, response){
-    const realusername = request.body.username
-    const realpassword = request.body.password
-
-    if(realusername == actualusername && realpassword == actualpassword){
-        request.session.isLoggedIn = true
-        response.redirect('/')
-    }else{
-        //err messg
-        response.render('login.hbs')
-    }
-})
 
 app.listen(8080)

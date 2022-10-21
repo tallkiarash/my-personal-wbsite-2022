@@ -35,9 +35,17 @@
         <li class="nav-item">
             <a href="/guestbook">GUESTBOOK</a>
         </li>
-        <li class="nav-item">
-                <a href="/login">LOG-IN</a>
-        </li>
+        {{#unless isLoggedIn}}
+            <li class="nav-item">
+                    <a href="/login">LOG-IN</a>
+            </li>
+        {{/unless}}
+
+        {{#if isLoggedIn}}
+            <li class="nav-item">
+                    <a href="/logout">LOG-out</a>
+            </li>
+        {{/if}}
     </ul>
     
     {{{body}}}
@@ -45,5 +53,6 @@
     <footer>
         COPYRIGHT 
     </footer>
+    
 </body>
 </html>

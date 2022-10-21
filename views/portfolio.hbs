@@ -79,10 +79,12 @@
                 <div class="col">
                     {{comment}}
                 </div>
-                <div class="col">
-                    <a href="/update-portfolio/{{id}}"> <button type="button" type="submit" class="btn btn-primary">Edit</button> </a>
-                    <form action="/delete-portfolio/{{id}}" method="POST"> <input type="submit" class="btn btn-danger" value="Delete"></form>
-                </div>
+                {{#if ../isLoggedIn}}
+                    <div class="col">
+                        <a href="/update-portfolio/{{id}}"> <button type="button" type="submit" class="btn btn-primary">Edit</button> </a>
+                        <form action="/delete-portfolio/{{id}}" method="POST"> <input type="submit" class="btn btn-danger" value="Delete"></form>
+                    </div>
+                {{/if}}
             </div>
         </div>
     {{/each}}
