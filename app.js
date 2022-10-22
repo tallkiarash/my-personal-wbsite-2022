@@ -5,6 +5,9 @@ const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
 const req = require('express/lib/request')
+const SQLiteStore = require('connect-sqlite3')(expressSession);
+
+const PORT = process.env.PORT || 8080;
 
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
@@ -25,7 +28,8 @@ app.use(bodyPaser.urlencoded({
 app.use(expressSession({
     secret:"ekeleslfmsldmadassdafggg", 
     saveUninitialized: false,
-    resave: false
+    resave: false,
+    store:new SQLiteStore()
 }))
 
 //database tables
@@ -185,6 +189,11 @@ app.post("/update-portfolio/:id" , function(request, response){
         name : newName,
         id : id
     }
+
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     if(validationErrors.length == 0){
         const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
 
@@ -331,6 +340,11 @@ app.post("/update-blogPost/:id" , function(request, response){
         name : newName,
         id : id
     }
+
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     if(validationErrors.length == 0){
         const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
 
@@ -455,6 +469,10 @@ app.post("/update-comments/:id" , function(request, response){
     const newName = request.body.name;
     const validationErrors = validationErrorsForGuestBook(newName, newComment)
 
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     const comment= {
         comment : newComment,
         name : newName,
@@ -499,5 +517,6 @@ app.post("/delete-comment/:id", function(request, response){
     })
 })
 
-
-app.listen(8080)
+app.listen(PORT, () => {
+  console.log("server started on port ${PORT}");
+});

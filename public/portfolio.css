@@ -7,7 +7,12 @@
     text-align: center;
     color: red;
 }
+
 .card-text{
     color: black;
     text-align: center;
+}
+
+.btn-primary {
+    margin-left: 10rem;
 }

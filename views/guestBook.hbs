@@ -41,7 +41,7 @@
                 </div>
                 {{#if ../isLoggedIn}}
                     <div class="col">
-                        <a href="/update-comments/{{id}}"> <button type="button" type="submit" class="btn btn-primary">Edit</button> </a>
+                        <a href="/update-comments/{{id}}"> <button type="button" type="submit" class="btn btn-warning">Edit</button> </a>
                         <form action="/delete-comment/{{id}}" method="POST"> <input type="submit" class="btn btn-danger" value="Delete"></form>
                     </div>
                 {{/if}}    
