@@ -7,8 +7,6 @@ const sqlite3 = require('sqlite3')
 const req = require('express/lib/request')
 const SQLiteStore = require('connect-sqlite3')(expressSession);
 
-const PORT = process.env.PORT || 8080;
-
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
 
@@ -472,7 +470,7 @@ app.post("/update-comments/:id" , function(request, response){
     if(!request.session.isLoggedIn){
         validationErrors.push("you have to log in!")
     }
-
+    
     const comment= {
         comment : newComment,
         name : newName,
@@ -517,6 +515,5 @@ app.post("/delete-comment/:id", function(request, response){
     })
 })
 
-app.listen(PORT, () => {
-  console.log("server started on port ${PORT}");
-});
+
+app.listen(8080)
