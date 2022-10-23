@@ -6,6 +6,11 @@ const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
 const req = require('express/lib/request')
 const SQLiteStore = require('connect-sqlite3')(expressSession);
+const bcrypt = require("bcrypt");
+
+const salt = 10;
+const hash = bcrypt.hashSync("Admin", 10);
+const status = bcrypt.compareSync("Admin", "$2b$10$JlZNsWZUx9YSsu4dfatiAuRVPn1dpYo0F168qQyp0Qj1tPdums7na");
 
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
@@ -81,9 +86,11 @@ app.post('/login', function (request, response){
 
     if(realusername == actualusername && realpassword == actualpassword){
         request.session.isLoggedIn = true
+        const status = bcrypt.compareSync("Admin", "$2b$10$JlZNsWZUx9YSsu4dfatiAuRVPn1dpYo0F168qQyp0Qj1tPdums7na");
+        console.log(status)
+        //err messg
         response.redirect('/')
     }else{
-        //err messg
         response.render('login.hbs')
     }
 })
@@ -516,4 +523,4 @@ app.post("/delete-comment/:id", function(request, response){
 })
 
 
-app.listen(80)
+app.listen(8080)
