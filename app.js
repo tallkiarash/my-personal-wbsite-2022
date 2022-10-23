@@ -4,7 +4,7 @@ const expressHandlebars = require("express-handlebars")
 const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
-const req = require('express/lib/request')
+// const req = require('express/lib/request')
 const SQLiteStore = require('connect-sqlite3')(expressSession);
 
 const db = new sqlite3.Database("my-website-db.db")
