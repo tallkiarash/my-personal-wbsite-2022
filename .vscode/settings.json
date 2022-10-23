@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/753e27bc-95ff-4b6f-9692-c949a2c9383d/AppServices/subscriptions/753e27bc-95ff-4b6f-9692-c949a2c9383d/resourceGroups/kiki-app/providers/Microsoft.Web/sites/kiki-portfolio",
+    "appService.deploySubpath": "."
+}
