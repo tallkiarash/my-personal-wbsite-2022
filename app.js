@@ -8,10 +8,6 @@ const req = require('express/lib/request')
 const SQLiteStore = require('connect-sqlite3')(expressSession);
 const bcrypt = require("bcrypt");
 
-const salt = 10;
-const hash = bcrypt.hashSync("Admin", 10);
-const status = bcrypt.compareSync("Admin", "$2b$10$JlZNsWZUx9YSsu4dfatiAuRVPn1dpYo0F168qQyp0Qj1tPdums7na");
-
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
 
@@ -62,7 +58,7 @@ db.run(`
 
 //username and password
 const actualusername = "kiarash"
-const actualpassword = "Admin"
+const actualpassword = "$2b$10$uVoRT4fbtuoY3.N0rDwXQOWPaZqGRQSby5xUZDE0544z5lpVd15GC"
 
 //rendering engine
 app.engine('hbs', expressHandlebars.engine({
@@ -83,21 +79,23 @@ app.get('/login', function (request, response){
 app.post('/login', function (request, response){
     const realusername = request.body.username
     const realpassword = request.body.password
+    
+    if(realusername == actualusername && bcrypt.compare(realpassword, actualpassword)) {
+        
+            request.session.isLoggedIn= true;
+            response.redirect("/");
 
-    if(realusername == actualusername && realpassword == actualpassword){
-        request.session.isLoggedIn = true
-        const status = bcrypt.compareSync("Admin", "$2b$10$JlZNsWZUx9YSsu4dfatiAuRVPn1dpYo0F168qQyp0Qj1tPdums7na");
-        console.log(status)
-        //err messg
-        response.redirect('/')
     }else{
-        response.render('login.hbs')
+        const model = {
+            failedLogin: true,
+        };
+        response.render('login.hbs', model);
     }
 })
 
 app.get("/logout", function(request, response){
     request.session.isLoggedIn= false
-    response.redirect("/")
+    response.redirect("/login")
 })
 
 //first page
