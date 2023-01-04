@@ -4,9 +4,8 @@ const expressHandlebars = require("express-handlebars")
 const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
-const req = require('express/lib/request')
 const SQLiteStore = require('connect-sqlite3')(expressSession);
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
@@ -21,7 +20,7 @@ app.use(
 )
 
 app.use(bodyPaser.urlencoded({
-  extended: false
+    extended: false
 }))
 
 app.use(expressSession({
@@ -33,7 +32,7 @@ app.use(expressSession({
 
 //database tables
 db.run(`
-    	CREATE TABLE IF NOT EXISTS COMMENTS (
+    CREATE TABLE IF NOT EXISTS COMMENTS (
         id INTEGER PRIMARY KEY,
         name TEXT,
         comment TEXT
@@ -41,10 +40,10 @@ db.run(`
 `)
 
 db.run(`
-    	CREATE TABLE IF NOT EXISTS PORTFOLIO (
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            comment TEXT
+    CREATE TABLE IF NOT EXISTS PORTFOLIO (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        comment TEXT
     )
 `)
 
@@ -57,8 +56,8 @@ db.run(`
 `)
 
 //username and password
-const actualusername = "kiarash"
-const actualpassword = "$2b$10$uVoRT4fbtuoY3.N0rDwXQOWPaZqGRQSby5xUZDE0544z5lpVd15GC"
+const correctUsername = "kiarash"
+const hashedvalue = "$2b$10$uVoRT4fbtuoY3.N0rDwXQOWPaZqGRQSby5xUZDE0544z5lpVd15GC"
 
 //rendering engine
 app.engine('hbs', expressHandlebars.engine({
@@ -77,13 +76,13 @@ app.get('/login', function (request, response){
 })
 
 app.post('/login', function (request, response){
-    const realusername = request.body.username
-    const realpassword = request.body.password
+    const enteredUsername = request.body.username
+    const enteredPassword = request.body.password
     
-    if(realusername == actualusername && bcrypt.compare(realpassword, actualpassword)) {
+    if(enteredUsername == correctUsername && bcrypt.compare(enteredPassword, hashedvalue)) {
         
-            request.session.isLoggedIn= true;
-            response.redirect("/");
+        request.session.isLoggedIn= true;
+        response.redirect("/");
 
     }else{
         const model = {
@@ -93,14 +92,14 @@ app.post('/login', function (request, response){
     }
 })
 
-app.get("/logout", function(request, response){
+app.post("/logout", function(request, response){
     request.session.isLoggedIn= false
     response.redirect("/login")
 })
 
 //first page
 app.get('/', function(request, response){
-    response.render('start.hbs') // you can make the sprate file of HTML and specify the name to open here
+    response.render('start.hbs')
 })
 
 //portfolio
@@ -120,7 +119,7 @@ function validationErrorsForPortfolio (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+        validationErrors.push("name should at least "+minNameLength+" charachters.")
     }
 
     if(comment.length <= minCommentsLength){
@@ -135,13 +134,22 @@ app.post("/portfolio", function(request, response){
     const comment = request.body.comment
     const validationErrors = validationErrorsForPortfolio(name, comment)
 
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     if (validationErrors.length== 0){
 
         const query=`INSERT INTO PORTFOLIO (name, comment) VALUES (?,?); `
         const VALUES = [name , comment]
 
         db.run(query, VALUES, function(error){
-            response.redirect("/portfolio")
+            if(error){
+                console.log(error)
+                response.render("error.hbs")
+            } else{
+                response.redirect("/portfolio")
+            }
         })
     }else{
         const model ={
@@ -209,6 +217,7 @@ app.post("/update-portfolio/:id" , function(request, response){
         db.run(query, VALUES, function (error){
             if(error){
                 console.log(error)
+                response.render("error.hbs")
             } else{
                 response.redirect("/portfolio")
             }
@@ -230,6 +239,7 @@ app.post("/delete-portfolio/:id", function(request, response){
     db.run(query, [id], function(error){
         if(error){
             console.log(error)
+            response.render("error.hbs")
         } 
         else{
             response. redirect("/portfolio")
@@ -239,11 +249,7 @@ app.post("/delete-portfolio/:id", function(request, response){
 
 //about me
 app.get('/aboutme', function (request, response){
-    const model = {
-        aboutme: data.aboutme
-    }
-
-    response.render('aboutme.hbs', model)
+    response.render('aboutme.hbs')
 })
 
 //info of me
@@ -287,12 +293,21 @@ app.post("/blogPost", function(request, response){
     const comment = request.body.comment
     const validationErrors = validationErrorsForBlogPost(name, comment)
 
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     if (validationErrors.length== 0){
         const query=`INSERT INTO BLOGPOST (name, comment) VALUES (?,?); `
         const VALUES = [name , comment]
 
         db.run(query, VALUES, function(error){
-            response.redirect("/blogPost")
+            if(error){
+                console.log(error)
+                response.render("error.hbs")
+            }else{
+                response.redirect("/blogPost")
+            }
         })
     }else{
         const model ={
@@ -360,6 +375,7 @@ app.post("/update-blogPost/:id" , function(request, response){
         db.run(query, VALUES, function (error){
             if(error){
                 console.log(error)
+                response.render("error.hbs")
             } else{
                 response.redirect("/blogPost")
             }
@@ -377,9 +393,14 @@ app.post("/update-blogPost/:id" , function(request, response){
 app.post("/delete-blogPost/:id", function(request, response){
     const id = request.params.id;
 
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     const query= `DELETE FROM BLOGPOST WHERE id = ?`;
     db.run(query, [id], function(error){
         if(error){
+            response.render("error.hbs")
             console.log(error)
         } 
         else{
@@ -426,7 +447,12 @@ app.post("/guestBook", function(request, response){
         const VALUES = [name , comment]
 
         db.run(query, VALUES, function(error){
-            response.redirect("/guestBook")
+            if(error){
+                console.log(error)
+                response.render("error.hbs")
+            }else{
+                response.redirect("/guestBook")
+            }
         })
     }else{
         const model ={
@@ -493,6 +519,7 @@ app.post("/update-comments/:id" , function(request, response){
         db.run(query, VALUES, function (error){
             if(error){
                 console.log(error)
+                response.render("error.hbs")
             } else{
                 response.redirect("/guestBook")
             }
@@ -513,6 +540,7 @@ app.post("/delete-comment/:id", function(request, response){
     db.run(query, [id], function(error){
         if(error){
             console.log(error)
+            response.render("error.hbs")
         } 
         else{
             response. redirect("/guestBook")

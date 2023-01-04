@@ -43,7 +43,9 @@
 
         {{#if isLoggedIn}}
             <li class="nav-item">
-                    <a href="/logout">LOG-OUT</a>
+                <form action="/logout" method="post">
+                    <input type="submit" value="logedout">
+                </form>
             </li>
         {{/if}}
     </ul>
