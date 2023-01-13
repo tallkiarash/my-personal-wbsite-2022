@@ -37,14 +37,14 @@
         </li>
         {{#unless isLoggedIn}}
             <li class="nav-item">
-                    <a href="/login">LOG-IN</a>
+                <a href="/login">LOG-IN</a>
             </li>
         {{/unless}}
 
         {{#if isLoggedIn}}
             <li class="nav-item">
                 <form action="/logout" method="post">
-                    <input type="submit" value="logedout">
+                    <input class="btn btn-outline-danger" type="submit" value="LOG-OUT">
                 </form>
             </li>
         {{/if}}

@@ -4,8 +4,7 @@ const expressHandlebars = require("express-handlebars")
 const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
 const sqlite3 = require('sqlite3')
-const SQLiteStore = require('connect-sqlite3')(expressSession);
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
 
 const db = new sqlite3.Database("my-website-db.db")
 const app = express()
@@ -14,7 +13,7 @@ const minCommentsLength = 10
 const minNameLength = 5
 
 //middleware function 
-///send the file to the browser
+///send the files to the browser
 app.use(
     express.static('public')
 )
@@ -27,7 +26,6 @@ app.use(expressSession({
     secret:"ekeleslfmsldmadassdafggg", 
     saveUninitialized: false,
     resave: false,
-    store:new SQLiteStore()
 }))
 
 //database tables
@@ -48,7 +46,7 @@ db.run(`
 `)
 
 db.run(`
-    	CREATE TABLE IF NOT EXISTS BLOGPOST (
+    CREATE TABLE IF NOT EXISTS BLOGPOST (
         id INTEGER PRIMARY KEY,
         name TEXT,
         comment TEXT
@@ -61,13 +59,13 @@ const hashedvalue = "$2b$10$uVoRT4fbtuoY3.N0rDwXQOWPaZqGRQSby5xUZDE0544z5lpVd15G
 
 //rendering engine
 app.engine('hbs', expressHandlebars.engine({
-    defaultLayout: "main.hbs" , 
+    defaultLayout: "main.hbs"
 }))
 
 app.use(function (request, response, next) {
-  const isLoggedIn = request.session.isLoggedIn;
-  response.locals.isLoggedIn = isLoggedIn;
-  next();
+    const isLoggedIn = request.session.isLoggedIn
+    response.locals.isLoggedIn = isLoggedIn
+    next()
 })
 
 //login 
@@ -81,14 +79,14 @@ app.post('/login', function (request, response){
     
     if(enteredUsername == correctUsername && bcrypt.compare(enteredPassword, hashedvalue)) {
         
-        request.session.isLoggedIn= true;
-        response.redirect("/");
+        request.session.isLoggedIn= true
+        response.redirect("/")
 
     }else{
         const model = {
-            failedLogin: true,
+            failedLogin: true
         };
-        response.render('login.hbs', model);
+        response.render('login.hbs', model)
     }
 })
 
@@ -110,8 +108,12 @@ app.get('/portfolio', function (request, response){
         const model = {
             portfolios
         }
-    
-        response.render('portfolio.hbs', model)
+		if(error){
+			console.log(error)
+			response.render("error.hbs")
+		} else{
+			response.render('portfolio.hbs', model)
+		}
     })
 })
 
@@ -119,11 +121,11 @@ function validationErrorsForPortfolio (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name should at least "+minNameLength+" charachters.")
+        validationErrors.push("name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
-        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+        validationErrors.push("Comment should at least "+minCommentsLength+" characters.")
     }
 
     return validationErrors
@@ -134,16 +136,12 @@ app.post("/portfolio", function(request, response){
     const comment = request.body.comment
     const validationErrors = validationErrorsForPortfolio(name, comment)
 
-    if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
-    }
-
     if (validationErrors.length== 0){
 
-        const query=`INSERT INTO PORTFOLIO (name, comment) VALUES (?,?); `
-        const VALUES = [name , comment]
+        const query=`INSERT INTO PORTFOLIO (name, comment) values(?,?); `
+        const values= [name , comment]
 
-        db.run(query, VALUES, function(error){
+        db.run(query, values, function(error){
             if(error){
                 console.log(error)
                 response.render("error.hbs")
@@ -166,33 +164,42 @@ app.get("/portfolio/:id", function(request, response){
     const id = request.params.id
 
     const query = `SELECT * FROM PORTFOLIO WHERE id = ?`
-    const VALUES = [id];
+    const values= [id]
 
-    db.get(query , VALUES, function(error, portfolio){
-
-        const model = {
-            portfolio
+    db.get(query , values, function(error, portfolio){
+        if (error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = {
+                portfolio
+            }
+            response.render('portfolio.hbs', model) 
         }
-        response.render('portfolio.hbs', model)
     })
 })
 
 app.get("/update-portfolio/:id" , function(request, response){
 
-    const id = request.params.id;
-    const query = `SELECT * FROM PORTFOLIO WHERE id = ?`;
-    const VALUES = [id];
+    const id = request.params.id
+    const query = `SELECT * FROM PORTFOLIO WHERE id = ?`
+    const values= [id]
 
-    db.get(query, VALUES, function(error , portfolio){
-        const model = { portfolio };
-        response.render("update-portfolio.hbs", model)
+    db.get(query, values, function(error , portfolio){
+        if(error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = { portfolio }
+            response.render("update-portfolio.hbs", model)
+        }
     })
 })
 
 app.post("/update-portfolio/:id" , function(request, response){
-    const id = request.params.id;
-    const newComment = request.body.comment;
-    const newName = request.body.name;
+    const id = request.params.id
+    const newComment = request.body.comment
+    const newName = request.body.name
     const validationErrors = validationErrorsForPortfolio(newName, newComment)
     
     const portfolio= {
@@ -209,12 +216,12 @@ app.post("/update-portfolio/:id" , function(request, response){
         const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
 
         
-        const VALUES = [
+        const values= [
             newName,
             newComment,
             id
         ]
-        db.run(query, VALUES, function (error){
+        db.run(query, values, function (error){
             if(error){
                 console.log(error)
                 response.render("error.hbs")
@@ -233,10 +240,14 @@ app.post("/update-portfolio/:id" , function(request, response){
 })
 
 app.post("/delete-portfolio/:id", function(request, response){
-    const id = request.params.id;
+    const id = request.params.id
 
-    const query= `DELETE FROM PORTFOLIO WHERE id = ?`;
-    db.run(query, [id], function(error){
+    if(!request.session.isLoggedIn){
+        response.redirect("/login")
+    }else{
+        const query= `DELETE FROM PORTFOLIO WHERE id = ?`
+
+        db.run(query, [id], function(error){
         if(error){
             console.log(error)
             response.render("error.hbs")
@@ -245,6 +256,7 @@ app.post("/delete-portfolio/:id", function(request, response){
             response. redirect("/portfolio")
         }
     })
+    }
 })
 
 //about me
@@ -269,8 +281,12 @@ app.get('/blogPost', function (request, response){
         const model = {
             blogPosts
         }
-    
-        response.render('blogPost.hbs', model)
+		if(error){
+			console.log(error)
+			response.render("error.hbs")
+		} else{
+			response.render('blogPost.hbs', model)
+		}
     })
 })
 
@@ -278,11 +294,11 @@ function validationErrorsForBlogPost (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+        validationErrors.push("name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
-        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+        validationErrors.push("Comment should at least "+minCommentsLength+" characters.")
     }
 
     return validationErrors
@@ -293,15 +309,11 @@ app.post("/blogPost", function(request, response){
     const comment = request.body.comment
     const validationErrors = validationErrorsForBlogPost(name, comment)
 
-    if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
-    }
-
     if (validationErrors.length== 0){
-        const query=`INSERT INTO BLOGPOST (name, comment) VALUES (?,?); `
-        const VALUES = [name , comment]
+        const query=`INSERT INTO BLOGPOST (name, comment) values(?,?); `
+        const values= [name , comment]
 
-        db.run(query, VALUES, function(error){
+        db.run(query, values, function(error){
             if(error){
                 console.log(error)
                 response.render("error.hbs")
@@ -324,33 +336,42 @@ app.get("/blogPost/:id", function(request, response){
     const id = request.params.id
 
     const query = `SELECT * FROM BLOGPOST WHERE id = ?`
-    const VALUES = [id];
+    const values= [id]
 
-    db.get(query , VALUES, function(error, blogPost){
-
-        const model = {
-            blogPost
+    db.get(query , values, function(error, blogPost){
+        if(error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = {
+                blogPost
+            }
+            response.render('blogPost.hbs', model)
         }
-        response.render('blogPost.hbs', model)
     })
 })
 
 app.get("/update-blogPost/:id" , function(request, response){
 
-    const id = request.params.id;
-    const query = `SELECT * FROM BLOGPOST WHERE id = ?`;
-    const VALUES = [id];
+    const id = request.params.id
+    const query = `SELECT * FROM BLOGPOST WHERE id = ?`
+    const values= [id];
 
-    db.get(query, VALUES, function(error , blogPost){
-        const model = { blogPost };
-        response.render("update-blogPost.hbs", model)
+    db.get(query, values, function(error , blogPost){
+        if(error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = { blogPost }
+            response.render("update-blogPost.hbs", model)
+        }
     })
 })
 
 app.post("/update-blogPost/:id" , function(request, response){
-    const id = request.params.id;
-    const newComment = request.body.comment;
-    const newName = request.body.name;
+    const id = request.params.id
+    const newComment = request.body.comment
+    const newName = request.body.name
     const validationErrors = validationErrorsForBlogPost(newName, newComment)
 
     const blogPost= {
@@ -366,13 +387,12 @@ app.post("/update-blogPost/:id" , function(request, response){
     if(validationErrors.length == 0){
         const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
 
-        
-        const VALUES = [
+        const values= [
             newName,
             newComment,
             id
         ]
-        db.run(query, VALUES, function (error){
+        db.run(query, values, function (error){
             if(error){
                 console.log(error)
                 response.render("error.hbs")
@@ -386,27 +406,25 @@ app.post("/update-blogPost/:id" , function(request, response){
             validationErrors
         }
         response.render("update-blogPost.hbs", model)
-    }
-    
+    } 
 })
 
 app.post("/delete-blogPost/:id", function(request, response){
-    const id = request.params.id;
+    const id = request.params.id
 
     if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
+        response.redirect("/login")
+    } else{
+        const query= `DELETE FROM BLOGPOST WHERE id = ?`
+        db.run(query, [id], function(error){
+            if(error){
+                response.render("error.hbs")
+                console.log(error)
+            }else{
+                response. redirect("/blogpost")
+            }
+        })
     }
-
-    const query= `DELETE FROM BLOGPOST WHERE id = ?`;
-    db.run(query, [id], function(error){
-        if(error){
-            response.render("error.hbs")
-            console.log(error)
-        } 
-        else{
-            response. redirect("/blogpost")
-        }
-    })
 })
 
 //guestbook
@@ -417,8 +435,12 @@ app.get('/guestBook', function (request, response){
         const model = {
             comments: comments
         }
-    
-        response.render('guestBook.hbs', model)
+		if(error){
+			console.log(error)
+			response.render("error.hbs")
+		} else{
+			response.render('guestBook.hbs', model)
+		}
     })
 })
 
@@ -426,11 +448,11 @@ function validationErrorsForGuestBook (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name Should at least "+minNameLength+" charachters.")
+        validationErrors.push("name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
-        validationErrors.push("Comment Should at least "+minCommentsLength+" charachters.")
+        validationErrors.push("Comment should at least "+minCommentsLength+" characters.")
     }
 
     return validationErrors
@@ -443,10 +465,10 @@ app.post("/guestBook", function(request, response){
 
     if (validationErrors.length== 0){
 
-        const query=`INSERT INTO comments (name, comment) VALUES (?,?); `
-        const VALUES = [name , comment]
+        const query=`INSERT INTO comments (name, comment) values(?,?); `
+        const values= [name , comment]
 
-        db.run(query, VALUES, function(error){
+        db.run(query, values, function(error){
             if(error){
                 console.log(error)
                 response.render("error.hbs")
@@ -469,56 +491,65 @@ app.get("/guestBook/:id", function(request, response){
     const id = request.params.id
 
     const query = `SELECT * FROM comments WHERE id = ?`
-    const VALUES = [id]
+    const values= [id]
 
-    db.get(query , VALUES, function(error, comments){
-
-        const model = {
-            comments
+    db.get(query , values, function(error, comments){
+        if(error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = {
+                comments
+            }
+            response.render('guestBook.hbs', model)
         }
-        response.render('guestBook.hbs', model)
     })
 })
 
 app.get("/update-comments/:id" , function(request, response){
 
-    const id = request.params.id;
-    const query = `SELECT * FROM COMMENTS WHERE id = ?`;
-    const VALUES = [id];
+    const id = request.params.id
+    const query = `SELECT * FROM COMMENTS WHERE id = ?`
+    const values= [id]
 
-    db.get(query, VALUES, function(error , comment){
-        const model = { comment };
-        response.render("update-comments.hbs", model)
+    db.get(query, values, function(error , comment){
+        if(error){
+            console.log(error)
+            response.render("error.hbs")
+        }else{
+            const model = { comment }
+            response.render("update-comments.hbs", model)
+        }
     })
 })
 
 app.post("/update-comments/:id" , function(request, response){
-    const id = request.params.id;
-    const newComment = request.body.comment;
-    const newName = request.body.name;
+    const id = request.params.id
+    const newComment = request.body.comment
+    const newName = request.body.name
     const validationErrors = validationErrorsForGuestBook(newName, newComment)
-
-    if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
-    }
     
     const comment= {
         comment : newComment,
         name : newName,
         id : id
     }
+
+    if(!request.session.isLoggedIn){
+        validationErrors.push("you have to log in!")
+    }
+
     if(validationErrors.length == 0){
         const query = ` UPDATE COMMENTS SET name =? , comment=? WHERE id =?`;
 
-        
-        const VALUES = [
+        const values= [
             newName,
             newComment,
             id
         ]
-        db.run(query, VALUES, function (error){
+        db.run(query, values, function (error){
             if(error){
-                console.log(error)
+            	console.log(error)
                 response.render("error.hbs")
             } else{
                 response.redirect("/guestBook")
@@ -534,19 +565,23 @@ app.post("/update-comments/:id" , function(request, response){
 })
 
 app.post("/delete-comment/:id", function(request, response){
-    const id = request.params.id;
+    const id = request.params.id
 
-    const query= `DELETE FROM COMMENTS WHERE id = ?`;
-    db.run(query, [id], function(error){
-        if(error){
-            console.log(error)
-            response.render("error.hbs")
-        } 
-        else{
-            response. redirect("/guestBook")
-        }
-    })
+    if(!request.session.isLoggedIn){
+        response.redirect("/login")
+    } else{
+
+        const query= `DELETE FROM COMMENTS WHERE id = ?`;
+        db.run(query, [id], function(error){
+            if(error){
+                console.log(error)
+                response.render("error.hbs")
+            } 
+            else{
+                response. redirect("/guestBook")
+            }
+        })
+    }
 })
-
 
 app.listen(8080)
