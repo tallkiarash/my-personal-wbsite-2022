@@ -3,6 +3,7 @@ const data = require('./data.js')
 const expressHandlebars = require("express-handlebars")
 const expressSession = require("express-session")
 const bodyPaser = require('body-parser')
+const SQLiteStore = require('connect-sqlite3')(expressSession)
 const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
 
@@ -26,6 +27,7 @@ app.use(expressSession({
     secret:"ekeleslfmsldmadassdafggg", 
     saveUninitialized: false,
     resave: false,
+    store: new SQLiteStore()
 }))
 
 //database tables
@@ -73,20 +75,18 @@ app.get('/login', function (request, response){
     response.render('login.hbs')
 })
 
+
 app.post('/login', function (request, response){
     const enteredUsername = request.body.username
     const enteredPassword = request.body.password
     
-    if(enteredUsername == correctUsername && bcrypt.compare(enteredPassword, hashedvalue)) {
+    if(enteredUsername == correctUsername && bcrypt.compareSync(enteredPassword, hashedvalue)) {
         
         request.session.isLoggedIn= true
         response.redirect("/")
 
     }else{
-        const model = {
-            failedLogin: true
-        };
-        response.render('login.hbs', model)
+        response.redirect('/login')
     }
 })
 
@@ -121,7 +121,7 @@ function validationErrorsForPortfolio (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name should at least "+minNameLength+" characters.")
+        validationErrors.push("Name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
@@ -200,7 +200,7 @@ app.post("/update-portfolio/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const validationErrors = validationErrorsForPortfolio(newName, newComment)
+    const Errors = validationErrorsForPortfolio(newName, newComment)
     
     const portfolio= {
         comment : newComment,
@@ -209,10 +209,10 @@ app.post("/update-portfolio/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
+        Errors.push("You have to log in!")
     }
 
-    if(validationErrors.length == 0){
+    if(Errors.length == 0){
         const query = ` UPDATE PORTFOLIO SET name =? , comment=? WHERE id =?`;
 
         
@@ -232,7 +232,7 @@ app.post("/update-portfolio/:id" , function(request, response){
     }else{
         const model = { 
             portfolio, 
-            validationErrors
+            Errors
         }
         response.render("update-portfolio.hbs", model)
     }
@@ -294,7 +294,7 @@ function validationErrorsForBlogPost (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name should at least "+minNameLength+" characters.")
+        validationErrors.push("Name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
@@ -372,7 +372,7 @@ app.post("/update-blogPost/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const validationErrors = validationErrorsForBlogPost(newName, newComment)
+    const Errors = validationErrorsForBlogPost(newName, newComment)
 
     const blogPost= {
         comment : newComment,
@@ -381,10 +381,10 @@ app.post("/update-blogPost/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
+        Errors.push("You have to log in!")
     }
 
-    if(validationErrors.length == 0){
+    if(Errors.length == 0){
         const query = ` UPDATE BLOGPOST SET name =? , comment=? WHERE id =?`;
 
         const values= [
@@ -403,7 +403,7 @@ app.post("/update-blogPost/:id" , function(request, response){
     } else{
         const model = { 
             blogPost, 
-            validationErrors
+            Errors
         }
         response.render("update-blogPost.hbs", model)
     } 
@@ -448,7 +448,7 @@ function validationErrorsForGuestBook (name , comment){
     const validationErrors = []
 
     if(name.length <= minNameLength){
-        validationErrors.push("name should at least "+minNameLength+" characters.")
+        validationErrors.push("Name should at least "+minNameLength+" characters.")
     }
 
     if(comment.length <= minCommentsLength){
@@ -527,7 +527,7 @@ app.post("/update-comments/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const validationErrors = validationErrorsForGuestBook(newName, newComment)
+    const Errors = validationErrorsForGuestBook(newName, newComment)
     
     const comment= {
         comment : newComment,
@@ -536,10 +536,10 @@ app.post("/update-comments/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        validationErrors.push("you have to log in!")
+        Errors.push("You have to log in!")
     }
 
-    if(validationErrors.length == 0){
+    if(Errors.length == 0){
         const query = ` UPDATE COMMENTS SET name =? , comment=? WHERE id =?`;
 
         const values= [
@@ -558,7 +558,7 @@ app.post("/update-comments/:id" , function(request, response){
     }else{
         const model = { 
             comment, 
-            validationErrors
+            Errors
         }
         response.render("update-comments.hbs", model)
     }

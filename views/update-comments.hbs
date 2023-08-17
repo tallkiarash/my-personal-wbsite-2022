@@ -1,7 +1,7 @@
-{{#if validationErrors.length}}
+{{#if Errors.length}}
     <p>could not create because:</p>
     <ul>
-        {{#each validationErrors}}
+        {{#each Errors}}
             <li>{{this}}</li>
         {{/each}}
     </ul>

@@ -2,16 +2,25 @@
     <h1>login information</h1>
 </div> 
 
-<form action="" method="post">
+{{#if validationErrors.length}}
+    <p>could not create because:</p>
+    <ul>
+        {{#each validationErrors}}
+            <li>{{this}}</li>
+        {{/each}}
+    </ul>
+{{/if}}
+
+<form action="/login" method="POST">
     <div class="form-floating mb-3">
         <input type="username" name="username" class="form-control" id="floatingInput" placeholder="Bob">
         <label for="floatingInput">username</label>
     </div>
     <div class="form-floating">
-        <input type="password" name ="password"class="form-control" id="floatingPassword" placeholder="Password">
+        <input type="password" value="" name ="password"class="form-control" id="floatingPassword" placeholder="Password">
         <label for="floatingPassword">Password</label>
     </div>
     <div class="butn">
-        <button class="btn btn-primary" type="submit">log-in</button>
+        <button class="btn btn-primary" value= "login" type="submit">log-in</button>
     </div>
 </form>
