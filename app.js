@@ -199,7 +199,7 @@ app.post("/update-portfolio/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const Errors = validationErrorsForPortfolio(newName, newComment)
+    const errors = validationErrorsForPortfolio(newName, newComment)
     
     const portfolio= {
         comment : newComment,
@@ -208,10 +208,10 @@ app.post("/update-portfolio/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        Errors.push("You have to log in!")
+        errors.push("You have to log in!")
     }
 
-    if(Errors.length == 0){
+    if(errors.length == 0){
         const query = ` UPDATE portfolio_comments SET name =? , comment=? WHERE id =?`;
 
         
@@ -231,7 +231,7 @@ app.post("/update-portfolio/:id" , function(request, response){
     }else{
         const model = { 
             portfolio, 
-            Errors
+            errors
         }
         response.render("update-portfolio.hbs", model)
     }
@@ -372,7 +372,7 @@ app.post("/update-blogPost/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const Errors = validationErrorsForBlogPost(newName, newComment)
+    const errors = validationErrorsForBlogPost(newName, newComment)
 
     const blogPost= {
         comment : newComment,
@@ -381,10 +381,10 @@ app.post("/update-blogPost/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        Errors.push("You have to log in!")
+        errors.push("You have to log in!")
     }
 
-    if(Errors.length == 0){
+    if(errors.length == 0){
         const query = ` UPDATE blogpost_comments SET name =? , comment=? WHERE id =?`;
 
         const values= [
@@ -403,7 +403,7 @@ app.post("/update-blogPost/:id" , function(request, response){
     } else{
         const model = { 
             blogPost, 
-            Errors
+            errors
         }
         response.render("update-blogPost.hbs", model)
     } 
@@ -528,7 +528,7 @@ app.post("/update-comments/:id" , function(request, response){
     const id = request.params.id
     const newComment = request.body.comment
     const newName = request.body.name
-    const Errors = validationErrorsForGuestBook(newName, newComment)
+    const errors = validationErrorsForGuestBook(newName, newComment)
     
     const comment= {
         comment : newComment,
@@ -537,10 +537,10 @@ app.post("/update-comments/:id" , function(request, response){
     }
 
     if(!request.session.isLoggedIn){
-        Errors.push("You have to log in!")
+        errors.push("You have to log in!")
     }
 
-    if(Errors.length == 0){
+    if(errors.length == 0){
         const query = ` UPDATE guestbook_comments SET name =? , comment=? WHERE id =?`;
 
         const values= [
@@ -559,7 +559,7 @@ app.post("/update-comments/:id" , function(request, response){
     }else{
         const model = { 
             comment, 
-            Errors
+            errors
         }
         response.render("update-comments.hbs", model)
     }
