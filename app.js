@@ -585,4 +585,4 @@ app.post("/delete-comment/:id", function(request, response){
     }
 })
 
-app.listen(80)
+app.listen(8080)
